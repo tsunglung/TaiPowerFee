@@ -1,0 +1,35 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "TaiPower Fee is already configured"
+        },
+        "error": {
+            "connection_error": "Can't connect to TaiPower Fee."
+        },
+        "flow_title": "TaiPower Fee: {name}",
+        "step": {
+            "user": {
+                "data": {
+                    "username": "User Name",
+                    "cust_no": "Cust No",
+                    "cookie": "Cookie",
+                    "csrf": "CSRF"
+                },
+                "description": "Please enter connection settings of your TaiPower Fee."
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "TaiPower Fee",
+                "data": {
+                    "username": "User Name",
+                    "cust_no": "Cust No",
+                    "cookie": "Cookie",
+                    "csrf": "CSRF"
+                }
+            }
+        }
+    }
+}

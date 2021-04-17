@@ -1,0 +1,35 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "\u53f0\u96fb\u96fb\u8cbb\u5df2\u7d93\u8a2d\u5b9a"
+        },
+        "error": {
+            "connection_error": "\u7121\u6cd5\u9023\u63a5 \u53f0\u96fb\u96fb\u8cbb."
+        },
+        "flow_title": "\u53f0\u96fb\u96fb\u8cbb: {name}",
+        "step": {
+            "user": {
+                "data": {
+                    "username": "\u540d\u7a31",
+                    "cust_no": "\u96fb\u865f",
+                    "cookie": "Cookie",
+                    "csrf": "CSRF"
+                },
+                "description": "\u8acb\u8f38\u5165\u4f60\u7684 \u53f0\u96fb\u96fb\u8cbb \u9023\u7dda\u8cc7\u8a0a."
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "\u53f0\u96fb\u96fb\u8cbb",
+                "data": {
+                    "username": "\u540d\u7a31",
+                    "cust_no": "\u96fb\u865f",
+                    "cookie": "Cookie",
+                    "csrf": "CSRF"
+                }
+            }
+        }
+    }
+}
