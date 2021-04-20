@@ -2,7 +2,7 @@
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, Event
-from .const import DOMAIN, DOMAINS
+from .const import DATA_KEY, DOMAIN, DOMAINS
 
 
 async def async_setup(hass: HomeAssistant, hass_config: dict):
@@ -24,17 +24,21 @@ async def async_remove_entry(hass, entry):
     except ValueError:
         pass
 
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
+    """ Unload Entry """
+    if entry.entry_id not in hass.data[DATA_KEY]:
+        return True
 
-async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry):
-    """Handle an options update."""
-    await hass.config_entries.async_reload(entry.entry_id)
-
+    return all([
+        await hass.config_entries.async_forward_entry_unload(entry, domain)
+        for domain in DOMAINS
+    ])
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Support TaiPower Fee."""
 
-    hass.data.setdefault(DOMAIN, {})
+#    hass.data.setdefault(DOMAIN, {})
 
     # migrate data (also after first setup) to options
     if entry.data:

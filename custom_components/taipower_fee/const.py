@@ -27,7 +27,7 @@ CONF_COOKIE = "cookie"
 CONF_CSRF = "csrf"
 ATTRIBUTION = "Powered by TaiPower Fee Data"
 
-HA_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.72 Safari/537.36 OPR/38.0.2220.41"
+HA_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.72 Safari/537.36 OPR/38.0.2220.41"
 BASE_URL = 'https://ebpps2.taipower.com.tw/simplebill/post-simple-query-billdetail'
 
 REQUEST_TIMEOUT = 10  # seconds

@@ -13,7 +13,7 @@
                     "username": "User Name",
                     "cust_no": "Cust No",
                     "cookie": "Cookie",
-                    "csrf": "CSRF"
+                    "csrf": "CSRF Token"
                 },
                 "description": "Please enter connection settings of your TaiPower Fee."
             }
@@ -27,9 +27,20 @@
                     "username": "User Name",
                     "cust_no": "Cust No",
                     "cookie": "Cookie",
-                    "csrf": "CSRF"
+                    "csrf": "CSRF Token"
                 }
             }
+        }
+    },
+    "state": {
+        "_": {
+            "billing_month": "Billing month",
+            "billing_date": "Billing date",
+            "payment": "Payment",
+            "power_consumption": "Power consumption",
+            "collection_date": "Collection date",
+            "billing_amount": "Billing amount",
+            "https_result": "Https result"
         }
     }
 }

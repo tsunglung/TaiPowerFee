@@ -1,7 +1,4 @@
-"""Support for the TaiPower Fee.
-
-https://ebpps2.taipower.com.tw/simplebill/simple-query-bill
-"""
+"""Support for the TaiPower Fee."""
 import logging
 from typing import Callable
 from datetime import timedelta
@@ -45,15 +42,14 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-MIN_TIME_BETWEEN_FORCED_UPDATES = timedelta(minutes=15)
-MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=45)
+MIN_TIME_BETWEEN_FORCED_UPDATES = timedelta(minutes=14)
+MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=60)
 
 
 async def async_setup_entry(
     hass: HomeAssistant, config: ConfigEntry, async_add_devices: Callable
 ) -> None:
     """Set up the TaiPower Fee Sensor from config."""
-    _LOGGER.error("setup_entry")
     if DATA_KEY not in hass.data:
         hass.data[DATA_KEY] = {}
 
@@ -69,6 +65,7 @@ async def async_setup_entry(
         cookie = config.options[CONF_COOKIE]
 
     data = TaiPowerFeeData(username, cust_no, csrf, cookie)
+    data.expired = False
     device = TaiPowerFeeSensor(data, cust_no)
 
     hass.data[DATA_KEY][config.entry_id] = device
@@ -85,15 +82,30 @@ class TaiPowerFeeData():
         self._custno = cust_no
         self._cookie = cookie
         self._csrf = csrf
+        self.expired = False
         self.uri = BASE_URL
 
+    def _parser_html(self, text):
+        """ parser html """
+        data = {}
+        soup = BeautifulSoup(text, 'html.parser')
+        billdetail = soup.find(id="billDaetailArea")
+        if billdetail:
+            results = billdetail.find_all(["th", "td"])
+            if results:
+                results2 = [i.string for i in results]
+                data = dict(zip(results2[::2], results2[1::2]))
+        return data
+
     def update_no_throttle(self):
-        """Get the data for a specific email."""
+        """Get the data for a specific water id."""
         self.update(no_throttle=True)
 
     @Throttle(MIN_TIME_BETWEEN_UPDATES, MIN_TIME_BETWEEN_FORCED_UPDATES)
     def update(self, **kwargs):
         """Get the latest data for cust no from REST service."""
+        if "SESSION=" not in self._cookie:
+            self._cookie = "SESSION={}".format(self._cookie)
         headers = {USER_AGENT: HA_USER_AGENT, "Cookie": self._cookie}
         payload = {
             "_csrf": self._csrf,
@@ -101,41 +113,49 @@ class TaiPowerFeeData():
             "billName": self._username,
             "Search": "\u67e5\u8a62\u660e\u7d30"}
 
-        try:
-            req = requests.post(
-                self.uri,
-                headers=headers,
-                data=payload,
-                timeout=REQUEST_TIMEOUT)
+        self.data = {}
+        self.data[self._custno] = {}
+        if not self.expired:
+            try:
+                req = requests.post(
+                    self.uri,
+                    headers=headers,
+                    data=payload,
+                    timeout=REQUEST_TIMEOUT)
 
-        except requests.exceptions.RequestException:
-            _LOGGER.error("Failed fetching data for %s", self._custno)
-            return
+            except requests.exceptions.RequestException:
+                _LOGGER.error("Failed fetching data for %s", self._custno)
+                return
 
-        if req.status_code == HTTP_OK:
-            soup = BeautifulSoup(req.text, 'html.parser')
-            billdetail = soup.find(id="billDaetailArea")
-            results = billdetail.find_all(["th", "td"])
-            results2 = [i.string for i in results]
-            self.data[self._custno] = dict(zip(results2[::2], results2[1::2]))
-            self.data[self._custno]['result'] = HTTP_OK
-
-        elif req.status_code == HTTP_NOT_FOUND:
-            self.data[self._custno] = []
-            self.data[self._custno]['result'] = HTTP_NOT_FOUND
-
+            if req.status_code == HTTP_OK:
+                self.data[self._custno] = self._parser_html(req.text)
+                if len(self.data[self._custno]) >= 1:
+                    self.data[self._custno]['result'] = HTTP_OK
+                else:
+                    self.data[self._custno]['result'] = HTTP_NOT_FOUND
+                self.expired = False
+                _LOGGER.error(self.data[self._custno])
+            elif req.status_code == HTTP_NOT_FOUND:
+                self.data[self._custno]['result'] = HTTP_NOT_FOUND
+                self.expired = True
+            else:
+                info = ""
+                self.data[self._custno]['result'] = req.status_code
+                if req.status_code == HTTP_FORBIDDEN:
+                    info = " CSRF token or Cookie is expired"
+                _LOGGER.error(
+                    "Failed fetching data for %s (HTTP Status_code = %d).%s",
+                    self._custno,
+                    req.status_code,
+                    info
+                )
+                self.expired = True
         else:
-            info = ""
-            if req.status_code == HTTP_FORBIDDEN:
-                info = "CSRF token or Cookie is expired"
-            _LOGGER.error(
-                "Failed fetching data for %s (HTTP Status_code = %d). %s",
+            self.data[self._custno]['result'] = 'sessions_expired'
+            _LOGGER.warning(
+                "Failed fetching data for %s (Sessions expired)",
                 self._custno,
-                req.status_code,
-                info
             )
-            self.data = {}
-            self.data[self._custno]['result'] = req.status_code
 
 
 class TaiPowerFeeSensor(SensorEntity):
@@ -192,16 +212,16 @@ class TaiPowerFeeSensor(SensorEntity):
     async def async_added_to_hass(self):
         """Get initial data."""
         # To make sure we get initial data for the sensors ignoring the normal
-        # throttle of 7 days but using an update throttle of 1 day
+        # throttle of 45 mintunes but using an update throttle of 15 mintunes
         self.hass.async_add_executor_job(self.update_nothrottle)
 
     def update_nothrottle(self, dummy=None):
         """Update sensor without throttle."""
         self._data.update_no_throttle()
 
-        # Schedule a forced update 1 day in the future if the update above
+        # Schedule a forced update 15 mintunes in the future if the update above
         # returned no data for this sensors power number.
-        if len(self._data.data) < 2:
+        if not self._data.expired:
             track_point_in_time(
                 self.hass,
                 self.update_nothrottle,
@@ -217,8 +237,10 @@ class TaiPowerFeeSensor(SensorEntity):
         self.hass.async_add_executor_job(self._data.update)
         if self._custno in self._data.data:
             for i, j in self._data.data[self._custno].items():
+                if i is None:
+                    continue
                 if "\u61c9\u7e73\u7e3d\u91d1\u984d\uff1a" in i:
-                    self._state = int(''.join(k for k in j if k.isdigit()))
+                    self._state = ''.join(k for k in j if k.isdigit() or k == ".")
                     self._attr_value[ATTR_BILL_AMOUNT] = j
                 if "\u5e33\u55ae\u6708\u4efd\uff1a" in i:
                     self._attr_value[ATTR_BILLING_MONTH] = j
@@ -230,7 +252,7 @@ class TaiPowerFeeSensor(SensorEntity):
                     self._attr_value[ATTR_POWER_CONSUMPTION] = j
                 if "\u4ee3\u6536\u622a\u6b62\u65e5\uff1a" in i:
                     self._attr_value[ATTR_COLLECTION_DATE] = j
-            self._attr_value[ATTR_HTTPS_RESULT] = self._data.data[
-                self._custno]['result']
+            self._attr_value[ATTR_HTTPS_RESULT] = self._data.data[self._custno].get(
+                'result', 'Unknow')
             if self._attr_value[ATTR_HTTPS_RESULT] == HTTP_FORBIDDEN:
                 self._state = None

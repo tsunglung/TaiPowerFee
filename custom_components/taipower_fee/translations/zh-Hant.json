@@ -13,7 +13,7 @@
                     "username": "\u540d\u7a31",
                     "cust_no": "\u96fb\u865f",
                     "cookie": "Cookie",
-                    "csrf": "CSRF"
+                    "csrf": "CSRF \u4ee4\u724c"
                 },
                 "description": "\u8acb\u8f38\u5165\u4f60\u7684 \u53f0\u96fb\u96fb\u8cbb \u9023\u7dda\u8cc7\u8a0a."
             }
@@ -27,9 +27,20 @@
                     "username": "\u540d\u7a31",
                     "cust_no": "\u96fb\u865f",
                     "cookie": "Cookie",
-                    "csrf": "CSRF"
+                    "csrf": "CSRF \u4ee4\u724c"
                 }
             }
+        }
+    },
+    "state": {
+        "_": {
+            "billing_month": "\u5e33\u55ae\u6708\u4efd",
+            "billing_date": "\u7e73\u8cbb\u671f\u9650",
+            "payment": "\u7e73\u8cbb\u671f\u9650",
+            "power_consumption": "\u7528\u96fb\u5ea6\u6578",
+            "collection_date": "\u4ee3\u6536\u622a\u6b62\u65e5",
+            "billing_amount": "\u61c9\u7e73\u7e3d\u91d1\u984d",
+            "https_result": "\u7db2\u7ad9\u56de\u61c9"
         }
     }
 }
