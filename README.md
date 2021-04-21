@@ -1,4 +1,6 @@
-Home assistant support for TaiPower Fee
+<a href="https://www.buymeacoffee.com/tsunglung" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="30" width="120"></a>
+
+Home assistant support for TaiPower Fee [Readme in Chinese](README_zh-Hant.md)
 
 The method was provided by [Jason Lee](https://www.dcard.tw/@jas0n.1ee.com).
 
