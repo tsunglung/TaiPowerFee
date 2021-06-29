@@ -5,6 +5,8 @@ DOMAIN = "taipower_fee"
 DOMAINS = ["sensor"]
 DATA_KEY = "sensor.taipower_fee"
 
+ATTR_BLACKOUT_GROUP = "blackout_group"
+ATTR_FEEDER_CODE = "feeder_code"
 ATTR_BILLING_MONTH = "billing_month"
 ATTR_BILLING_DATE = "billing_date"
 ATTR_PAYMENT = "payment"
@@ -13,6 +15,8 @@ ATTR_COLLECTION_DATE = "collection_date"
 ATTR_BILL_AMOUNT = "billing_amount"
 ATTR_HTTPS_RESULT = "https_result"
 ATTR_LIST = [
+    ATTR_BLACKOUT_GROUP,
+    ATTR_FEEDER_CODE,
     ATTR_BILLING_MONTH,
     ATTR_BILLING_DATE,
     ATTR_PAYMENT,
@@ -27,7 +31,8 @@ CONF_COOKIE = "cookie"
 CONF_CSRF = "csrf"
 ATTRIBUTION = "Powered by TaiPower Fee Data"
 
-HA_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.72 Safari/537.36 OPR/38.0.2220.41"
+HA_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " \
+    "(KHTML, like Gecko) Chrome/90.0.4430.72 Safari/537.36 OPR/38.0.2220.41"
 BASE_URL = 'https://ebpps2.taipower.com.tw/simplebill/post-simple-query-billdetail'
 
 REQUEST_TIMEOUT = 10  # seconds

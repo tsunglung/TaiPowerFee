@@ -34,6 +34,8 @@
     },
     "state": {
         "_": {
+            "blackout_group": "\u8f2a\u6d41\u505c\u96fb\u7d44\u5225",
+            "feeder_code": "\u994b\u7dda\u4ee3\u865f",
             "billing_month": "\u5e33\u55ae\u6708\u4efd",
             "billing_date": "\u7e73\u8cbb\u671f\u9650",
             "payment": "\u7e73\u8cbb\u671f\u9650",

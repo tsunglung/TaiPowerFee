@@ -8,7 +8,7 @@ from homeassistant.config_entries import (
     ConfigFlow,
     OptionsFlow,
     ConfigEntry
-    )
+)
 from homeassistant.const import CONF_NAME, CONF_USERNAME
 from homeassistant.core import callback
 from homeassistant.helpers.typing import ConfigType

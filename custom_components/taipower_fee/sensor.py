@@ -23,6 +23,8 @@ from homeassistant.const import (
 )
 from .const import (
     ATTRIBUTION,
+    ATTR_BLACKOUT_GROUP,
+    ATTR_FEEDER_CODE,
     ATTR_BILLING_MONTH,
     ATTR_BILLING_DATE,
     ATTR_PAYMENT,
@@ -89,7 +91,7 @@ class TaiPowerFeeData():
         """ parser html """
         data = {}
         soup = BeautifulSoup(text, 'html.parser')
-        billdetail = soup.find(id="billDaetailArea")
+        billdetail = soup.find(class_="ap")
         if billdetail:
             results = billdetail.find_all(["th", "td"])
             if results:
@@ -134,7 +136,6 @@ class TaiPowerFeeData():
                 else:
                     self.data[self._custno]['result'] = HTTP_NOT_FOUND
                 self.expired = False
-                _LOGGER.error(self.data[self._custno])
             elif req.status_code == HTTP_NOT_FOUND:
                 self.data[self._custno]['result'] = HTTP_NOT_FOUND
                 self.expired = True
@@ -239,6 +240,10 @@ class TaiPowerFeeSensor(SensorEntity):
             for i, j in self._data.data[self._custno].items():
                 if i is None:
                     continue
+                if "\u8f2a\u6d41\u505c\u96fb\u7d44\u5225" in i:
+                    self._attr_value[ATTR_BLACKOUT_GROUP] = j
+                if "\u994b\u7dda\u4ee3\u865f" in i:
+                    self._attr_value[ATTR_FEEDER_CODE] = j
                 if "\u61c9\u7e73\u7e3d\u91d1\u984d\uff1a" in i:
                     self._state = ''.join(k for k in j if k.isdigit() or k == ".")
                     self._attr_value[ATTR_BILL_AMOUNT] = j
